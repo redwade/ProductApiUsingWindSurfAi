@@ -1,0 +1,107 @@
+### Windsurf Product API - Example Requests
+### Use with REST Client extension in VS Code or any HTTP client
+
+@baseUrl = https://localhost:5001
+@contentType = application/json
+
+### Health Check
+GET {{baseUrl}}/api/health
+
+### ==========================================
+### PRODUCT CRUD OPERATIONS
+### ==========================================
+
+### Get All Products
+GET {{baseUrl}}/api/products
+
+### Get Product by ID
+GET {{baseUrl}}/api/products/1
+
+### Create New Product
+POST {{baseUrl}}/api/products
+Content-Type: {{contentType}}
+
+{
+  "name": "Premium Laptop",
+  "description": "High-performance laptop with 16GB RAM and 512GB SSD",
+  "price": 1299.99,
+  "category": "Electronics"
+}
+
+### Create Another Product
+POST {{baseUrl}}/api/products
+Content-Type: {{contentType}}
+
+{
+  "name": "Running Shoes",
+  "description": "Lightweight running shoes with advanced cushioning",
+  "price": 89.99,
+  "category": "Sports"
+}
+
+### Update Product
+PUT {{baseUrl}}/api/products/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Wireless Headphones Pro",
+  "description": "Premium wireless headphones with active noise cancellation",
+  "price": 249.99,
+  "category": "Electronics"
+}
+
+### Delete Product
+DELETE {{baseUrl}}/api/products/3
+
+### ==========================================
+### AI-POWERED FEATURES
+### ==========================================
+
+### Generate Complete AI Insights for Product
+POST {{baseUrl}}/api/products/1/ai-insights
+
+### Generate Marketing Description Only
+POST {{baseUrl}}/api/products/1/marketing-description
+
+### Analyze Product Positioning
+POST {{baseUrl}}/api/products/1/positioning
+
+### Analyze Pricing Strategy
+POST {{baseUrl}}/api/products/1/pricing-analysis
+
+### Suggest Category
+POST {{baseUrl}}/api/products/1/suggest-category
+
+### ==========================================
+### CATALOG-WIDE AI FEATURES
+### ==========================================
+
+### Generate Catalog Insights
+POST {{baseUrl}}/api/catalog/ai-insights
+
+### Batch Analyze Entire Catalog
+POST {{baseUrl}}/api/catalog/batch-analyze
+
+### ==========================================
+### WORKFLOW EXAMPLE: Complete Product Lifecycle
+### ==========================================
+
+### 1. Create a new product
+POST {{baseUrl}}/api/products
+Content-Type: {{contentType}}
+
+{
+  "name": "Ergonomic Office Chair",
+  "description": "Comfortable office chair with lumbar support",
+  "price": 349.99,
+  "category": "Furniture"
+}
+
+### 2. Generate AI insights for the new product (use ID from response above)
+POST {{baseUrl}}/api/products/4/ai-insights
+
+### 3. View the updated product with AI insights
+GET {{baseUrl}}/api/products/4
+
+### 4. Get catalog-wide insights
+POST {{baseUrl}}/api/catalog/ai-insights
