@@ -34,6 +34,9 @@ builder.Services.AddHttpClient<IWindsurfAIService, WindsurfAIService>(client =>
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
+// Register Payment Service
+builder.Services.AddScoped<IPaymentService, StripePaymentService>();
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -375,6 +378,128 @@ app.MapPost("/api/catalog/batch-analyze", async (ProductDbContext db, IWindsurfA
 {
     Summary = "Batch analyze entire catalog",
     Description = "Automatically categorizes and analyzes all products in the catalog using AI"
+});
+
+// ============================================
+// PAYMENT ENDPOINTS
+// ============================================
+
+app.MapPost("/api/payments/create", async (PaymentRequest request, IPaymentService paymentService) =>
+{
+    try
+    {
+        var response = await paymentService.CreatePaymentIntent(request);
+        return Results.Ok(response);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(detail: ex.Message, statusCode: 500);
+    }
+})
+.WithName("CreatePayment")
+.WithTags("Payments")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Create a payment intent",
+    Description = "Creates a Stripe payment intent for purchasing a product"
+});
+
+app.MapPost("/api/payments/{paymentIntentId}/confirm", async (string paymentIntentId, IPaymentService paymentService) =>
+{
+    try
+    {
+        var confirmation = await paymentService.ConfirmPayment(paymentIntentId);
+        return Results.Ok(confirmation);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.NotFound(new { error = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(detail: ex.Message, statusCode: 500);
+    }
+})
+.WithName("ConfirmPayment")
+.WithTags("Payments")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Confirm a payment",
+    Description = "Confirms and retrieves the status of a payment intent"
+});
+
+app.MapPost("/api/payments/{paymentIntentId}/cancel", async (string paymentIntentId, IPaymentService paymentService) =>
+{
+    try
+    {
+        var confirmation = await paymentService.CancelPayment(paymentIntentId);
+        return Results.Ok(confirmation);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.NotFound(new { error = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(detail: ex.Message, statusCode: 500);
+    }
+})
+.WithName("CancelPayment")
+.WithTags("Payments")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Cancel a payment",
+    Description = "Cancels a pending payment intent"
+});
+
+app.MapGet("/api/payments/{paymentIntentId}", async (string paymentIntentId, IPaymentService paymentService) =>
+{
+    var payment = await paymentService.GetPaymentStatus(paymentIntentId);
+    return payment is not null ? Results.Ok(payment) : Results.NotFound();
+})
+.WithName("GetPaymentStatus")
+.WithTags("Payments")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Get payment status",
+    Description = "Retrieves the current status of a payment intent"
+});
+
+app.MapGet("/api/payments", async (string? customerEmail, IPaymentService paymentService) =>
+{
+    var payments = await paymentService.GetPaymentHistory(customerEmail);
+    return Results.Ok(payments);
+})
+.WithName("GetPaymentHistory")
+.WithTags("Payments")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Get payment history",
+    Description = "Retrieves payment history, optionally filtered by customer email"
+});
+
+app.MapGet("/api/products/{productId}/calculate-price", async (int productId, int quantity, IPaymentService paymentService) =>
+{
+    try
+    {
+        var totalAmount = await paymentService.CalculateTotalAmount(productId, quantity);
+        return Results.Ok(new { ProductId = productId, Quantity = quantity, TotalAmount = totalAmount });
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+})
+.WithName("CalculatePrice")
+.WithTags("Payments")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Calculate total price",
+    Description = "Calculates the total price for a product with given quantity"
 });
 
 // ============================================

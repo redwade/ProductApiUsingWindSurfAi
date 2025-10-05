@@ -18,6 +18,13 @@ A powerful .NET 8 Web API with **Windsurf AI Integration** for intelligent produ
 - **Catalog-Wide Insights** - Generate actionable business intelligence from your entire catalog
 - **Batch Processing** - Analyze multiple products simultaneously
 
+### 💳 Payment Integration
+- **Stripe Payment Processing** - Secure payment handling with Stripe
+- **Payment Intent Management** - Create, confirm, and cancel payments
+- **Payment History** - Track all transactions
+- **Price Calculation** - Calculate totals before payment
+- **Mock Mode** - Test without Stripe API keys
+
 ## 🛠️ Tech Stack
 
 - **.NET 8.0**

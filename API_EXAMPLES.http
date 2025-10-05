@@ -105,3 +105,69 @@ GET {{baseUrl}}/api/products/4
 
 ### 4. Get catalog-wide insights
 POST {{baseUrl}}/api/catalog/ai-insights
+
+### ==========================================
+### PAYMENT PROCESSING (STRIPE)
+### ==========================================
+
+### Calculate Price Before Payment
+GET {{baseUrl}}/api/products/1/calculate-price?quantity=2
+
+### Create Payment Intent
+POST {{baseUrl}}/api/payments/create
+Content-Type: {{contentType}}
+
+{
+  "productId": 1,
+  "quantity": 2,
+  "customerEmail": "customer@example.com",
+  "customerName": "John Doe",
+  "currency": "usd"
+}
+
+### Confirm Payment (replace with actual payment intent ID from above)
+@paymentIntentId = pi_mock_abc123
+POST {{baseUrl}}/api/payments/{{paymentIntentId}}/confirm
+
+### Get Payment Status
+GET {{baseUrl}}/api/payments/{{paymentIntentId}}
+
+### Cancel Payment
+POST {{baseUrl}}/api/payments/{{paymentIntentId}}/cancel
+
+### Get All Payment History
+GET {{baseUrl}}/api/payments
+
+### Get Payment History for Specific Customer
+GET {{baseUrl}}/api/payments?customerEmail=customer@example.com
+
+### ==========================================
+### COMPLETE PURCHASE WORKFLOW
+### ==========================================
+
+### Step 1: Browse products
+GET {{baseUrl}}/api/products
+
+### Step 2: Calculate total price
+GET {{baseUrl}}/api/products/1/calculate-price?quantity=3
+
+### Step 3: Create payment intent
+POST {{baseUrl}}/api/payments/create
+Content-Type: {{contentType}}
+
+{
+  "productId": 1,
+  "quantity": 3,
+  "customerEmail": "buyer@example.com",
+  "customerName": "Jane Smith"
+}
+
+### Step 4: Confirm payment (after Stripe.js processes card)
+# Replace with actual payment intent ID from step 3
+POST {{baseUrl}}/api/payments/pi_mock_xyz789/confirm
+
+### Step 5: View payment confirmation
+GET {{baseUrl}}/api/payments/pi_mock_xyz789
+
+### Step 6: View customer's payment history
+GET {{baseUrl}}/api/payments?customerEmail=buyer@example.com

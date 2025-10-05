@@ -10,6 +10,7 @@ public class ProductDbContext : DbContext
     }
 
     public DbSet<Product> Products { get; set; }
+    public DbSet<PaymentIntent> PaymentIntents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
