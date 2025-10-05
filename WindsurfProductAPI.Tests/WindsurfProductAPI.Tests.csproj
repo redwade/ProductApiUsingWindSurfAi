@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0.8</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- xUnit for TDD -->
+    <PackageReference Include="xunit" Version="2.6.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    
+    <!-- SpecFlow for BDD -->
+    <PackageReference Include="SpecFlow" Version="3.9.74" />
+    <PackageReference Include="SpecFlow.xUnit" Version="3.9.74" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.9.74" />
+    
+    <!-- Mocking and Testing Utilities -->
+    <PackageReference Include="Moq" Version="4.20.70" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    
+    <!-- ASP.NET Core Testing -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    
+    <!-- Entity Framework Testing -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WindsurfProductAPI.csproj" />
+  </ItemGroup>
+
+</Project>

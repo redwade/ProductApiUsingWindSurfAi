@@ -1,0 +1,18 @@
+{
+  "language": {
+    "feature": "en"
+  },
+  "bindingCulture": {
+    "name": "en-US"
+  },
+  "stepAssemblies": [
+    {
+      "assembly": "WindsurfProductAPI.Tests"
+    }
+  ],
+  "trace": {
+    "traceSuccessfulSteps": true,
+    "traceTimings": true,
+    "minTracedDuration": "0:0:0.1"
+  }
+}
