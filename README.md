@@ -25,6 +25,14 @@ A powerful .NET 8 Web API with **Windsurf AI Integration** for intelligent produ
 - **Price Calculation** - Calculate totals before payment
 - **Mock Mode** - Test without Stripe API keys
 
+### 📦 Shipping Integration
+- **Multi-Carrier Support** - FedEx, UPS, USPS, DHL
+- **Rate Comparison** - Get rates from all carriers
+- **Label Generation** - Automatic shipping label creation
+- **Real-time Tracking** - Track shipments with updates
+- **Shipment History** - View all shipments by customer
+- **Cost Calculator** - Calculate shipping costs before creating shipment
+
 ## 🛠️ Tech Stack
 
 - **.NET 8.0**
@@ -113,6 +121,30 @@ The API will start at:
 | POST | `/api/products/{id}/suggest-category` | Suggest optimal category |
 | POST | `/api/catalog/ai-insights` | Generate catalog-wide insights |
 | POST | `/api/catalog/batch-analyze` | Batch analyze all products |
+
+### Payments
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/payments/create` | Create payment intent |
+| POST | `/api/payments/{id}/confirm` | Confirm payment |
+| POST | `/api/payments/{id}/cancel` | Cancel payment |
+| GET | `/api/payments/{id}` | Get payment status |
+| GET | `/api/payments` | Get payment history |
+| GET | `/api/products/{id}/calculate-price` | Calculate total price |
+
+### Shipping
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/shipping/rates` | Get shipping rates from all carriers |
+| POST | `/api/shipping/create` | Create shipment and generate label |
+| GET | `/api/shipping/{id}` | Get shipment by ID |
+| GET | `/api/shipping/track/{trackingNumber}` | Track shipment |
+| GET | `/api/shipping/track/{trackingNumber}/updates` | Get tracking updates |
+| POST | `/api/shipping/{id}/cancel` | Cancel shipment |
+| GET | `/api/shipping` | Get shipment history |
+| GET | `/api/shipping/calculate-cost` | Calculate shipping cost |
 
 ### System
 

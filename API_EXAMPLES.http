@@ -171,3 +171,183 @@ GET {{baseUrl}}/api/payments/pi_mock_xyz789
 
 ### Step 6: View customer's payment history
 GET {{baseUrl}}/api/payments?customerEmail=buyer@example.com
+
+### ==========================================
+### SHIPPING MANAGEMENT
+### ==========================================
+
+### Get Shipping Rates
+POST {{baseUrl}}/api/shipping/rates
+Content-Type: {{contentType}}
+
+{
+  "fromAddress": {
+    "name": "Warehouse",
+    "street1": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "postalCode": "94102",
+    "country": "US"
+  },
+  "toAddress": {
+    "name": "Customer",
+    "street1": "456 Oak Ave",
+    "city": "New York",
+    "state": "NY",
+    "postalCode": "10001",
+    "country": "US",
+    "email": "customer@example.com"
+  },
+  "dimensions": {
+    "length": 12,
+    "width": 10,
+    "height": 8,
+    "weight": 5
+  }
+}
+
+### Create Shipment
+POST {{baseUrl}}/api/shipping/create
+Content-Type: {{contentType}}
+
+{
+  "provider": "FedEx",
+  "speed": "Express",
+  "fromAddress": {
+    "name": "Warehouse",
+    "street1": "123 Main St",
+    "city": "San Francisco",
+    "state": "CA",
+    "postalCode": "94102",
+    "country": "US"
+  },
+  "toAddress": {
+    "name": "John Doe",
+    "street1": "456 Oak Ave",
+    "city": "New York",
+    "state": "NY",
+    "postalCode": "10001",
+    "country": "US",
+    "phone": "555-1234",
+    "email": "customer@example.com"
+  },
+  "dimensions": {
+    "length": 12,
+    "width": 10,
+    "height": 8,
+    "weight": 5
+  },
+  "notes": "Handle with care"
+}
+
+### Get Shipment by ID
+@shipmentId = 1
+GET {{baseUrl}}/api/shipping/{{shipmentId}}
+
+### Track Shipment by Tracking Number
+@trackingNumber = FX123456789
+GET {{baseUrl}}/api/shipping/track/{{trackingNumber}}
+
+### Get Tracking Updates
+GET {{baseUrl}}/api/shipping/track/{{trackingNumber}}/updates
+
+### Cancel Shipment
+POST {{baseUrl}}/api/shipping/{{shipmentId}}/cancel
+
+### Get All Shipments
+GET {{baseUrl}}/api/shipping
+
+### Get Shipments for Specific Customer
+GET {{baseUrl}}/api/shipping?customerEmail=customer@example.com
+
+### Calculate Shipping Cost
+GET {{baseUrl}}/api/shipping/calculate-cost?provider=FedEx&speed=Express&weight=5
+
+### ==========================================
+### COMPLETE E-COMMERCE WORKFLOW
+### ==========================================
+
+### Step 1: Browse products
+GET {{baseUrl}}/api/products
+
+### Step 2: Get shipping rates
+POST {{baseUrl}}/api/shipping/rates
+Content-Type: {{contentType}}
+
+{
+  "fromAddress": {
+    "name": "Warehouse",
+    "street1": "123 Main St",
+    "city": "Los Angeles",
+    "state": "CA",
+    "postalCode": "90001",
+    "country": "US"
+  },
+  "toAddress": {
+    "name": "Customer",
+    "street1": "789 Pine St",
+    "city": "Seattle",
+    "state": "WA",
+    "postalCode": "98101",
+    "country": "US",
+    "email": "buyer@example.com"
+  },
+  "dimensions": {
+    "length": 10,
+    "width": 8,
+    "height": 6,
+    "weight": 3
+  }
+}
+
+### Step 3: Create payment for product + shipping
+POST {{baseUrl}}/api/payments/create
+Content-Type: {{contentType}}
+
+{
+  "productId": 1,
+  "quantity": 1,
+  "customerEmail": "buyer@example.com",
+  "customerName": "Jane Smith"
+}
+
+### Step 4: Confirm payment
+# Use payment intent ID from step 3
+POST {{baseUrl}}/api/payments/pi_mock_abc123/confirm
+
+### Step 5: Create shipment after payment
+POST {{baseUrl}}/api/shipping/create
+Content-Type: {{contentType}}
+
+{
+  "provider": "FedEx",
+  "speed": "Standard",
+  "fromAddress": {
+    "name": "Warehouse",
+    "street1": "123 Main St",
+    "city": "Los Angeles",
+    "state": "CA",
+    "postalCode": "90001",
+    "country": "US"
+  },
+  "toAddress": {
+    "name": "Jane Smith",
+    "street1": "789 Pine St",
+    "city": "Seattle",
+    "state": "WA",
+    "postalCode": "98101",
+    "country": "US",
+    "email": "buyer@example.com"
+  },
+  "dimensions": {
+    "length": 10,
+    "width": 8,
+    "height": 6,
+    "weight": 3
+  },
+  "paymentIntentId": 1
+}
+
+### Step 6: Track the shipment
+# Use tracking number from step 5
+GET {{baseUrl}}/api/shipping/track/FX123456789/updates

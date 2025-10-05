@@ -37,6 +37,9 @@ builder.Services.AddHttpClient<IWindsurfAIService, WindsurfAIService>(client =>
 // Register Payment Service
 builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 
+// Register Shipping Service
+builder.Services.AddScoped<IShippingService, ShippingService>();
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -500,6 +503,170 @@ app.MapGet("/api/products/{productId}/calculate-price", async (int productId, in
 {
     Summary = "Calculate total price",
     Description = "Calculates the total price for a product with given quantity"
+});
+
+// ============================================
+// SHIPPING ENDPOINTS
+// ============================================
+
+app.MapPost("/api/shipping/rates", async (ShippingRateRequest request, IShippingService shippingService) =>
+{
+    try
+    {
+        var rates = await shippingService.GetShippingRates(request);
+        return Results.Ok(rates);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(detail: ex.Message, statusCode: 500);
+    }
+})
+.WithName("GetShippingRates")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Get shipping rates",
+    Description = "Get shipping rates from all providers for the given package and addresses"
+});
+
+app.MapPost("/api/shipping/create", async (CreateShipmentRequest request, IShippingService shippingService) =>
+{
+    try
+    {
+        var shipment = await shippingService.CreateShipment(request);
+        return Results.Created($"/api/shipping/{shipment.ShipmentId}", shipment);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(detail: ex.Message, statusCode: 500);
+    }
+})
+.WithName("CreateShipment")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Create a shipment",
+    Description = "Creates a new shipment and generates a shipping label"
+});
+
+app.MapGet("/api/shipping/{shipmentId:int}", async (int shipmentId, IShippingService shippingService) =>
+{
+    var shipment = await shippingService.GetShipment(shipmentId);
+    return shipment is not null ? Results.Ok(shipment) : Results.NotFound();
+})
+.WithName("GetShipment")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Get shipment by ID",
+    Description = "Retrieves shipment details by shipment ID"
+});
+
+app.MapGet("/api/shipping/track/{trackingNumber}", async (string trackingNumber, IShippingService shippingService) =>
+{
+    var shipment = await shippingService.GetShipmentByTracking(trackingNumber);
+    return shipment is not null ? Results.Ok(shipment) : Results.NotFound();
+})
+.WithName("GetShipmentByTracking")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Get shipment by tracking number",
+    Description = "Retrieves shipment details by tracking number"
+});
+
+app.MapGet("/api/shipping/track/{trackingNumber}/updates", async (string trackingNumber, IShippingService shippingService) =>
+{
+    try
+    {
+        var updates = await shippingService.GetTrackingUpdates(trackingNumber);
+        return Results.Ok(updates);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.NotFound(new { error = ex.Message });
+    }
+})
+.WithName("GetTrackingUpdates")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Get tracking updates",
+    Description = "Retrieves all tracking updates for a shipment"
+});
+
+app.MapPost("/api/shipping/{shipmentId:int}/cancel", async (int shipmentId, IShippingService shippingService) =>
+{
+    try
+    {
+        var shipment = await shippingService.CancelShipment(shipmentId);
+        return Results.Ok(shipment);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.NotFound(new { error = ex.Message });
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+})
+.WithName("CancelShipment")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Cancel a shipment",
+    Description = "Cancels a shipment if it hasn't been delivered yet"
+});
+
+app.MapGet("/api/shipping", async (string? customerEmail, IShippingService shippingService) =>
+{
+    var shipments = await shippingService.GetShipmentHistory(customerEmail);
+    return Results.Ok(shipments);
+})
+.WithName("GetShipmentHistory")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Get shipment history",
+    Description = "Retrieves shipment history, optionally filtered by customer email"
+});
+
+app.MapGet("/api/shipping/calculate-cost", (string provider, string speed, decimal weight, IShippingService shippingService) =>
+{
+    try
+    {
+        var providerEnum = Enum.Parse<ShippingProvider>(provider, true);
+        var speedEnum = Enum.Parse<ShippingSpeed>(speed, true);
+        var cost = shippingService.CalculateShippingCost(providerEnum, speedEnum, weight);
+        
+        return Results.Ok(new 
+        { 
+            Provider = provider, 
+            Speed = speed, 
+            Weight = weight, 
+            Cost = cost 
+        });
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+})
+.WithName("CalculateShippingCost")
+.WithTags("Shipping")
+.WithOpenApi(operation => new(operation)
+{
+    Summary = "Calculate shipping cost",
+    Description = "Calculates shipping cost for given provider, speed, and weight"
 });
 
 // ============================================
